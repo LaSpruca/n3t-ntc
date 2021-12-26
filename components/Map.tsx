@@ -21,7 +21,7 @@ const Map = () => {
             });
 
             // Add navigation control (the +/- zoom buttons)
-            map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+            map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
             map.on('move', () => {
                 setLng(parseFloat(map.getCenter().lng.toFixed(4)));
@@ -46,6 +46,7 @@ const Map = () => {
                         width: 100%;
                         z-index: -1;
                         pointer-events: all;
+                        padding: 1rem;
                     }
                 `}
             </style>

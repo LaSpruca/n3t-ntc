@@ -9,6 +9,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     return (
         <>
             <Head>
+                <title>N3T NTC | Map View</title>
                 <link
                     href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css"
                     rel="stylesheet"
@@ -23,10 +24,6 @@ function MyApp({ Component, pageProps }: AppProps) {
                     font-family: -apple-system, BlinkMacSystemFont, Segoe UI,
                         Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
                         Helvetica Neue, sans-serif;
-                }
-
-                .__next {
-                    width: max-content;
                     pointer-events: none;
                 }
 
@@ -39,20 +36,9 @@ function MyApp({ Component, pageProps }: AppProps) {
                     margin: 0;
                     box-sizing: border-box;
                 }
-
-                .side-bar {
-                    margin: 2.5rem 0 0 2.5rem;
-                    padding: 1rem;
-                    height: calc(100vh - 5rem);
-                    width: fit-content;
-                    background-color: #ddffdd;
-                    pointer-events: all;
-                }
             `}</style>
 
-            <div className="side-bar">
-                <SideBar currentPage={page} />
-            </div>
+            <SideBar currentPage={page} />
             <Component {...pageProps} />
         </>
     );

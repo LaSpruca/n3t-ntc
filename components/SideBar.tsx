@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     AccountCircleOutlined,
     InfoOutlined,
@@ -9,6 +9,7 @@ import {
 import { UI_PRIMARY } from '$lib/colors';
 import Image from 'next/image';
 import N3TLogo from '$assets/images/logo_n3t.png';
+import Link from 'next/link';
 
 export enum Pages {
     Home,
@@ -19,19 +20,24 @@ export type SideBarProps = {
 };
 
 const SideBar = ({}: SideBarProps) => {
-    const expandToggle = () => {};
+    const [expanded, setExpanded] = useState(false);
+
+    const expandToggle = () => {
+        setExpanded(!expanded);
+    };
 
     return (
         <>
-            {/* Component scoped styles */}
             <style jsx>
                 {`
                     .sidebar {
+                        position: fixed;
+                        left: 2.5rem;
+                        top: 2.5rem;
                         border-radius: 10px;
                         pointer-events: all;
                         background-color: ${UI_PRIMARY};
                         padding: 1rem;
-                        margin: 2.5rem 0 0 2.5rem;
                         height: calc(100vh - 5rem);
                         width: max-content;
                         display: flex;
@@ -59,6 +65,21 @@ const SideBar = ({}: SideBarProps) => {
                                 flex-grow: 2;
                             }
                         }
+
+                        &--expanded {
+                            .nav-button {
+                                width: 100%;
+                                display: flex;
+                                gap: 0.5rem;
+
+                                &__text {
+                                    display: initial;
+                                    text-align: left;
+                                    flex-grow: 1;
+                                    padding-right: 0.5rem;
+                                }
+                            }
+                        }
                     }
 
                     .nav-button {
@@ -78,34 +99,52 @@ const SideBar = ({}: SideBarProps) => {
                             width: 24px;
                             height: 24px;
                         }
+
+                        &__text {
+                            display: none;
+                        }
                     }
                 `}
             </style>
-            <div className="sidebar">
+
+            <div className={'sidebar ' + (expanded ? 'sidebar--expanded' : '')}>
                 <div className="sidebar__section sidebar__section--small">
                     <div className="sidebar__logo">
                         <Image src={N3TLogo} alt="N3T Logo" />
                     </div>
                     <button onClick={expandToggle} className="nav-button">
                         <Menu className="nav-button__icon" />
+                        <span className="nav-button__text">Collapse</span>
                     </button>
                 </div>
 
                 <nav className="sidebar__section sidebar__section--large">
-                    <button className="nav-button">
-                        <MapOutlined className="nav-button__icon" />
-                    </button>
-                    <button className="nav-button">
-                        <PictureAsPdfOutlined className="nav-button__icon" />
-                    </button>
-                    <button className="nav-button">
-                        <InfoOutlined className="nav-button__icon" />
-                    </button>
+                    <Link href="/">
+                        <a className="nav-button">
+                            <MapOutlined className="nav-button__icon" />
+                            <span className="nav-button__text">Map</span>
+                        </a>
+                    </Link>
+                    <Link href="/report">
+                        <a className="nav-button">
+                            <PictureAsPdfOutlined className="nav-button__icon" />
+                            <span className="nav-button__text">
+                                Download Report
+                            </span>
+                        </a>
+                    </Link>
+                    <Link href="/docs">
+                        <a className="nav-button">
+                            <InfoOutlined className="nav-button__icon" />
+                            <span className="nav-button__text">User Docs</span>
+                        </a>
+                    </Link>
                 </nav>
 
                 <div className="sidebar__section sidebar__section--small">
                     <button className="nav-button">
                         <AccountCircleOutlined className="nav-button" />
+                        <span className="nav-button__text">Account</span>
                     </button>
                 </div>
             </div>

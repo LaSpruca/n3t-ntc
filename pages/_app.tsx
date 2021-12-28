@@ -17,9 +17,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         } else {
             setContentMargin(0);
         }
-    }, [page]);
-
-    console.log('ref', sbRef.current);
+    }, [page, sbRef]);
 
     return (
         <>
@@ -56,6 +54,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <style jsx>{`
                 .app-content {
                     margin-left: ${contentMargin}px;
+                    pointer-events: all;
                 }
             `}</style>
 

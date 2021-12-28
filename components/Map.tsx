@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
+import mapboxgl from 'mapbox-gl';
+import { GeoJsonObject } from 'geojson'; // eslint-disable-line import/no-webpack-loader-syntax
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_KEY ?? '';
 
@@ -9,13 +10,24 @@ const Map = () => {
     const [lng, setLng] = useState(173);
     const [lat, setLat] = useState(-41);
     const [zoom, setZoom] = useState(5);
+    const [points, setPoints] = useState<GeoJsonObject[]>([]);
+
+    useEffect(() => {
+        fetch('/api/get-points')
+            .then(async (res) => {
+                setPoints(await res.json());
+            })
+            .catch((ex) => {
+                console.error('Could not fetch points', points);
+            });
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Initialize map when component mounts
     useEffect(() => {
         if (mapContainerRef.current !== null) {
             const map = new mapboxgl.Map({
                 container: mapContainerRef.current,
-                style: 'mapbox://styles/mapbox/streets-v11',
+                style: 'mapbox://styles/laspruca/ckxpk8yvk112814mo1wenbeyg',
                 center: [lng, lat],
                 zoom: zoom,
             });
@@ -45,7 +57,6 @@ const Map = () => {
                         height: 100vh;
                         width: 100%;
                         z-index: -1;
-                        pointer-events: all;
                         padding: 1rem;
                     }
                 `}

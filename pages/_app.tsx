@@ -11,13 +11,19 @@ function MyApp({ Component, pageProps }: AppProps) {
     const page = pageMap[router.route] ?? Pages.NotFound;
     const [contentMargin, setContentMargin] = useState(0);
 
-    useEffect(() => {
+    // Used to resize the margin for the main consent to stop it overlapping (or being overlapped by) the sidebar
+    // Defined here to allow the sidebar to call it when it resizes
+    const calcMargin = () => {
+        console.log('Resizing app');
         if (!(page in floatingSideBarPages)) {
             setContentMargin(sbRef.current?.clientWidth ?? 0);
         } else {
             setContentMargin(0);
         }
-    }, [page, sbRef]);
+    };
+
+    // Update the margin on page change, once we have the reference to the sidebar
+    useEffect(calcMargin, [page, sbRef]);
 
     return (
         <>
@@ -58,7 +64,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 }
             `}</style>
 
-            <SideBar currentPage={page} ref={sbRef} />
+            <SideBar currentPage={page} ref={sbRef} resized={calcMargin} />
 
             <div className="app-content">
                 <Component {...pageProps} />

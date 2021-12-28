@@ -1,4 +1,4 @@
-import React, { ForwardedRef, forwardRef, useState } from 'react';
+import React, { ForwardedRef, forwardRef, useEffect, useState } from 'react';
 import {
     AccountCircleOutlined,
     InfoOutlined,
@@ -14,10 +14,11 @@ import Pages, { floatingSideBarPages } from '$lib/pages';
 
 export type SideBarProps = {
     currentPage: Pages;
+    resized: () => void;
 };
 
 const SideBar = forwardRef(function SideBarComponent(
-    { currentPage }: SideBarProps,
+    { currentPage, resized }: SideBarProps,
     ref: ForwardedRef<HTMLDivElement>
 ) {
     const [expanded, setExpanded] = useState(false);
@@ -27,6 +28,13 @@ const SideBar = forwardRef(function SideBarComponent(
     const expandToggle = () => {
         setExpanded(!expanded);
     };
+
+    // Call resized callback to tell the parent component that the widget has resized
+    useEffect(() => {
+        if (!floating) {
+            resized();
+        }
+    }, [expanded, floating]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <>
@@ -38,7 +46,7 @@ const SideBar = forwardRef(function SideBarComponent(
                         top: 0;
                         border-radius: 0 10px 10px 0;
                         pointer-events: all;
-                        background-color: ${UI_PRIMARY};
+                        background-color: #333;
                         padding: 1rem;
                         height: 100vh;
                         width: max-content;
@@ -102,6 +110,7 @@ const SideBar = forwardRef(function SideBarComponent(
                         border-radius: 10px;
                         border: none;
                         background-color: white;
+                        transition: width 200ms ease-in-out;
 
                         &:active {
                             outline: none;

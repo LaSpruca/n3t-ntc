@@ -36,7 +36,7 @@ const SideBar = forwardRef(function SideBarComponent(
                         position: fixed;
                         left: 0;
                         top: 0;
-                        border-radius: 10px;
+                        border-radius: 0 10px 10px 0;
                         pointer-events: all;
                         background-color: ${UI_PRIMARY};
                         padding: 1rem;
@@ -45,13 +45,15 @@ const SideBar = forwardRef(function SideBarComponent(
                         display: flex;
                         flex-direction: column;
                         gap: 5%;
-                        transition: height 0.5ms ease-in-out,
-                            left 0.5ms ease-in-out, right 0.5ms ease-in-out;
+                        transition: left 200ms ease-in-out,
+                            top 200ms ease-in-out, height 200ms ease-in-out,
+                            border-radius 200ms ease-in-out;
 
                         &--floating {
                             height: calc(100vh - 5rem);
                             left: 2.5rem;
                             top: 2.5rem;
+                            border-radius: 10px;
                         }
 
                         &__logo {
@@ -120,7 +122,7 @@ const SideBar = forwardRef(function SideBarComponent(
             <div
                 className={
                     'sidebar ' +
-                    (expanded ? 'sidebar--expanded' : '') +
+                    (expanded ? 'sidebar--expanded ' : '') +
                     (floating ? 'sidebar--floating' : '')
                 }
                 ref={ref}

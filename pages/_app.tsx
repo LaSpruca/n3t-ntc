@@ -1,10 +1,25 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import SideBar, { Pages } from '../components/SideBar';
-import React, { useState } from 'react';
+import SideBar from '../components/SideBar';
+import React, { createRef, useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import Pages, { pageMap, floatingSideBarPages } from '$lib/pages';
 
 function MyApp({ Component, pageProps }: AppProps) {
-    const [page, setPage] = useState(Pages.Home);
+    const router = useRouter();
+    const sbRef = createRef<HTMLDivElement>();
+    const page = pageMap[router.route] ?? Pages.NotFound;
+    const [contentMargin, setContentMargin] = useState(0);
+
+    useEffect(() => {
+        if (!(page in floatingSideBarPages)) {
+            setContentMargin(sbRef.current?.clientWidth ?? 0);
+        } else {
+            setContentMargin(0);
+        }
+    }, [page]);
+
+    console.log('ref', sbRef.current);
 
     return (
         <>
@@ -38,8 +53,17 @@ function MyApp({ Component, pageProps }: AppProps) {
                 }
             `}</style>
 
-            <SideBar currentPage={page} />
-            <Component {...pageProps} />
+            <style jsx>{`
+                .app-content {
+                    margin-left: ${contentMargin}px;
+                }
+            `}</style>
+
+            <SideBar currentPage={page} ref={sbRef} />
+
+            <div className="app-content">
+                <Component {...pageProps} />
+            </div>
         </>
     );
 }

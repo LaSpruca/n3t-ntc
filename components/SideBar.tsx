@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ForwardedRef, forwardRef, useState } from 'react';
 import {
     AccountCircleOutlined,
     InfoOutlined,
@@ -10,17 +10,19 @@ import { UI_PRIMARY } from '$lib/colors';
 import Image from 'next/image';
 import N3TLogo from '$assets/images/logo_n3t.png';
 import Link from 'next/link';
-
-export enum Pages {
-    Home,
-}
+import Pages, { floatingSideBarPages } from '$lib/pages';
 
 export type SideBarProps = {
     currentPage: Pages;
 };
 
-const SideBar = ({}: SideBarProps) => {
+const SideBar = forwardRef(function SideBarComponent(
+    { currentPage }: SideBarProps,
+    ref: ForwardedRef<HTMLDivElement>
+) {
     const [expanded, setExpanded] = useState(false);
+    // Used to decide weather the sidebar should be floating
+    const floating = currentPage in floatingSideBarPages;
 
     const expandToggle = () => {
         setExpanded(!expanded);
@@ -32,17 +34,25 @@ const SideBar = ({}: SideBarProps) => {
                 {`
                     .sidebar {
                         position: fixed;
-                        left: 2.5rem;
-                        top: 2.5rem;
+                        left: 0;
+                        top: 0;
                         border-radius: 10px;
                         pointer-events: all;
                         background-color: ${UI_PRIMARY};
                         padding: 1rem;
-                        height: calc(100vh - 5rem);
+                        height: 100vh;
                         width: max-content;
                         display: flex;
                         flex-direction: column;
                         gap: 5%;
+                        transition: height 0.5ms ease-in-out,
+                            left 0.5ms ease-in-out, right 0.5ms ease-in-out;
+
+                        &--floating {
+                            height: calc(100vh - 5rem);
+                            left: 2.5rem;
+                            top: 2.5rem;
+                        }
 
                         &__logo {
                             width: 48px;
@@ -107,7 +117,14 @@ const SideBar = ({}: SideBarProps) => {
                 `}
             </style>
 
-            <div className={'sidebar ' + (expanded ? 'sidebar--expanded' : '')}>
+            <div
+                className={
+                    'sidebar ' +
+                    (expanded ? 'sidebar--expanded' : '') +
+                    (floating ? 'sidebar--floating' : '')
+                }
+                ref={ref}
+            >
                 <div className="sidebar__section sidebar__section--small">
                     <div className="sidebar__logo">
                         <Image src={N3TLogo} alt="N3T Logo" />
@@ -150,6 +167,6 @@ const SideBar = ({}: SideBarProps) => {
             </div>
         </>
     );
-};
+});
 
 export default SideBar;

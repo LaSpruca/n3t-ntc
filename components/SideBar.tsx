@@ -6,7 +6,6 @@ import {
     Menu,
     PictureAsPdfOutlined,
 } from '@mui/icons-material';
-import { UI_PRIMARY } from '$lib/colors';
 import Image from 'next/image';
 import N3TLogo from '$assets/images/logo_n3t.png';
 import Link from 'next/link';
@@ -147,7 +146,7 @@ const SideBar = forwardRef(function SideBarComponent(
                 </div>
 
                 <nav className="sidebar__section sidebar__section--large">
-                    <Link href="/">
+                    <Link href="/map">
                         <a className="nav-button">
                             <MapOutlined className="nav-button__icon" />
                             <span className="nav-button__text">Map</span>

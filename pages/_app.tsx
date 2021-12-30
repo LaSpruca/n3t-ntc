@@ -41,7 +41,6 @@ function App({ Component, pageProps }: AppProps) {
     }, [loggedIn, router]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
-        console.log('brrrr');
         sessionStorage.setItem('authState', JSON.stringify(authState));
     }, [authState]);
 

@@ -10,6 +10,7 @@ import Image from 'next/image';
 import N3TLogo from '$assets/images/logo_n3t.png';
 import Link from 'next/link';
 import Pages, { floatingSideBarPages } from '$lib/pages';
+import { UI_PRIMARY } from '$lib/colors';
 
 export type SideBarProps = {
     currentPage: Pages;
@@ -30,7 +31,6 @@ const SideBar = forwardRef(function SideBarComponent(
 
     // Call resized callback to tell the parent component that the widget has resized
     useEffect(() => {
-        console.log(floating, currentPage, floatingSideBarPages);
         if (!floating) {
             resized();
         }
@@ -46,7 +46,7 @@ const SideBar = forwardRef(function SideBarComponent(
                         top: 0;
                         border-radius: 0 10px 10px 0;
                         pointer-events: all;
-                        background-color: #333;
+                        background-color: ${UI_PRIMARY};
                         padding: 1rem;
                         height: 100vh;
                         width: max-content;
@@ -56,6 +56,8 @@ const SideBar = forwardRef(function SideBarComponent(
                         transition: left 200ms ease-in-out,
                             top 200ms ease-in-out, height 200ms ease-in-out,
                             border-radius 200ms ease-in-out;
+
+                        box-shadow: 0 0 25px 5px rgba(0, 0, 0, 0.5);
 
                         &--floating {
                             height: calc(100vh - 5rem);

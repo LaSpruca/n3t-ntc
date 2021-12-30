@@ -1,1 +1,1 @@
-export const UI_PRIMARY = '#E4EEE0';
+export const UI_PRIMARY = '#333';

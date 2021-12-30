@@ -9,11 +9,16 @@ import {
 } from 'react';
 import { AuthContext } from '$components/contexts/AuthContext';
 import { useRouter } from 'next/router';
+import { UI_PRIMARY } from '$lib/colors';
 
 export const Index: NextPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const { login: authLogin } = useContext(AuthContext);
+    const [{ error, isError }, setError] = useState({
+        error: '',
+        isError: false,
+    });
     const router = useRouter();
 
     const updatePassword: EventHandler<ChangeEvent<HTMLInputElement>> = (
@@ -33,6 +38,8 @@ export const Index: NextPage = () => {
         if (username == 'demo' && password == 'D3mopass!') {
             authLogin();
             await router.push('/map');
+        } else {
+            setError({ error: 'Invalid username or password', isError: true });
         }
     };
 
@@ -44,6 +51,10 @@ export const Index: NextPage = () => {
                     h2 {
                         text-align: center;
                         padding: 0.5rem;
+                    }
+
+                    &__error {
+                        color: red;
                     }
 
                     &--wrapper {
@@ -59,6 +70,26 @@ export const Index: NextPage = () => {
                         display: flex;
                         gap: 2rem;
                         flex-direction: column;
+                        align-items: center;
+                    }
+
+                    &__button {
+                        width: fit-content;
+                        font-size: 1rem;
+                        padding: 1rem;
+
+                        border: 1px solid ${UI_PRIMARY};
+                        border-radius: 10px;
+                        transition: outline 0.05s linear,
+                            background-color 0.5s linear;
+
+                        background-color: ${UI_PRIMARY};
+                        color: white;
+
+                        &:hover {
+                            cursor: pointer;
+                            background-color: #222;
+                        }
                     }
 
                     &__field {
@@ -66,6 +97,14 @@ export const Index: NextPage = () => {
 
                         input {
                             padding: 1rem;
+                            border: 1px solid ${UI_PRIMARY};
+                            border-radius: 10px;
+                            transition: outline 0.05s linear;
+
+                            &:active,
+                            &:focus {
+                                outline: ${UI_PRIMARY} 2px solid;
+                            }
                         }
 
                         label {
@@ -94,6 +133,11 @@ export const Index: NextPage = () => {
                 <div className="login">
                     <h1>N3T - NT</h1>
                     <h2>Login</h2>
+                    {isError ? (
+                        <p className="login__error">Error: {error}</p>
+                    ) : (
+                        ''
+                    )}
                     <div className="login__fields">
                         <div
                             className={
@@ -122,10 +166,11 @@ export const Index: NextPage = () => {
                             />
                             <label htmlFor="password">Password</label>
                         </div>
+
+                        <button className="login__button" onClick={login}>
+                            Login
+                        </button>
                     </div>
-                    <button className="login__button" onClick={login}>
-                        Login
-                    </button>
                 </div>
             </div>
         </>

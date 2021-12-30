@@ -8,7 +8,7 @@ const useSessionStorage = <T>(key: string, initial: T): T => {
         if (stored) {
             setValue(JSON.parse(stored));
         }
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return value;
 };

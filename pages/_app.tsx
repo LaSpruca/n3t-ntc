@@ -39,7 +39,7 @@ function App({ Component, pageProps }: AppProps) {
         if (!loggedIn) {
             router.push('/').catch((ex) => console.error(ex));
         }
-    }, [loggedIn, router]);
+    }, [loggedIn, router]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         console.log('brrrr');

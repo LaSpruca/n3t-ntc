@@ -14,7 +14,7 @@ const MapLoading = () => (
             :global(.loading) {
                 width: 5rem;
                 height: 5rem;
-                animation: spin infinite 2s ease-in-out;
+                animation: spin infinite 2s ease-in-out reverse;
             }
 
             @keyframes spin {

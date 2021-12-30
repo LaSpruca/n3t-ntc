@@ -22,7 +22,7 @@ const SideBar = forwardRef(function SideBarComponent(
 ) {
     const [expanded, setExpanded] = useState(false);
     // Used to decide weather the sidebar should be floating
-    const floating = currentPage in floatingSideBarPages;
+    const floating = floatingSideBarPages.includes(currentPage);
 
     const expandToggle = () => {
         setExpanded(!expanded);
@@ -30,6 +30,7 @@ const SideBar = forwardRef(function SideBarComponent(
 
     // Call resized callback to tell the parent component that the widget has resized
     useEffect(() => {
+        console.log(floating, currentPage, floatingSideBarPages);
         if (!floating) {
             resized();
         }

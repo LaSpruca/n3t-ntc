@@ -24,4 +24,4 @@ export const pageTitle: Record<Pages, string> = {
 };
 
 // All the pages that should have a floating sidebar;
-export const floatingSideBarPages = [Pages.Home];
+export const floatingSideBarPages = [Pages.Map];

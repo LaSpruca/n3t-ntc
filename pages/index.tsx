@@ -36,10 +36,6 @@ export const Index: NextPage = () => {
         }
     };
 
-    useEffect(() => {
-        console.log(username);
-    }, [username]);
-
     return (
         <>
             <style jsx>{`

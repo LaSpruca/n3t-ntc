@@ -30,15 +30,14 @@ function App({ Component, pageProps }: AppProps) {
     });
 
     useEffect(() => {
-        console.log('Update?');
+        if (!loggedIn && page != Pages.Home) {
+            router.push('/').catch((ex) => console.error(ex));
+        }
+
         setAuthState({
             ...authState,
             loggedIn,
         });
-
-        if (!loggedIn) {
-            router.push('/').catch((ex) => console.error(ex));
-        }
     }, [loggedIn, router]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {

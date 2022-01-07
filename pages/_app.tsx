@@ -3,49 +3,33 @@ import Head from 'next/head';
 import SideBar from '../components/SideBar';
 import React, { createRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import Pages, { pageMap, floatingSideBarPages, pageTitle } from '$lib/pages';
-import { AuthContext, AuthState } from '$components/contexts/AuthContext';
-import useSessionStorage from '$lib/hooks/useSessionStorage';
+import Pages, { floatingSideBarPages, pageMap, pageTitle } from '$lib/pages';
+import AuthContext, { useAuthContext } from '$components/contexts/AuthContext';
+import '../styles/global.scss';
+import styles from '../styles/pages/_app.module.scss';
 
+/**
+ * Map "layout" of the app, setup state and adds sidebar, makes sure that the
+ * user is logged in etc.
+ * @param Component The child component to be rendered
+ * @param pageProps The props passed to the page
+ * @param env The environment variables loaded at runtime
+ * @constructor
+ */
 function App({ Component, pageProps }: AppProps) {
     const router = useRouter();
+
+    // Ref to the sidebar
     const sbRef = createRef<HTMLDivElement>();
-    const page = pageMap[router.route] ?? Pages.NotFound;
+    // How much margin should be added to page to account for sidebar
     const [contentMargin, setContentMargin] = useState(0);
 
-    const storedAuth = useSessionStorage('authState', {
-        loggedIn: false,
-    });
+    // Current page as Paags enum, for lookups
+    const page = pageMap[router.route] ?? Pages.NotFound;
 
-    const [loggedIn, setLoggedIn] = useState(storedAuth.loggedIn);
-
-    const [authState, setAuthState] = useState<AuthState>({
-        loggedIn,
-        login: () => {
-            setLoggedIn(true);
-        },
-        logout: () => {
-            setLoggedIn(false);
-        },
-    });
-
-    useEffect(() => {
-        if (!loggedIn && page != Pages.Home) {
-            router.push('/').catch((ex) => console.error(ex));
-        }
-
-        setAuthState({
-            ...authState,
-            loggedIn,
-        });
-    }, [loggedIn, router]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    useEffect(() => {
-        sessionStorage.setItem('authState', JSON.stringify(authState));
-    }, [authState]);
-
-    // Used to resize the margin for the main consent to stop it overlapping (or being overlapped by) the sidebar
-    // Defined here to allow the sidebar to call it when it resizes
+    // Used to resize the margin for the main consent to stop it overlapping
+    // (or being overlapped by) the sidebar. Defined here to allow the SideBar
+    // component to call it when it resizes
     const calcMargin = () => {
         if (!(page in floatingSideBarPages)) {
             setContentMargin(sbRef.current?.clientWidth ?? 0);
@@ -54,8 +38,22 @@ function App({ Component, pageProps }: AppProps) {
         }
     };
 
-    // Update the margin on page change, once we have the reference to the sidebar
+    // Update the margin on page change, once we have the reference to the
+    // sidebar or when the page changes
     useEffect(calcMargin, [page, sbRef]);
+
+    // Generate the AuthContext objects
+    const authState = useAuthContext();
+
+    // Redirect if not logged in and not on login page
+    if (
+        typeof window !== 'undefined' &&
+        page !== Pages.Home &&
+        !authState.accessToken
+    ) {
+        router.push('/');
+        return <></>;
+    }
 
     return (
         <AuthContext.Provider value={authState}>
@@ -66,43 +64,21 @@ function App({ Component, pageProps }: AppProps) {
                     rel="stylesheet"
                 />
             </Head>
-
-            <style global jsx>{`
-                html,
-                body {
-                    padding: 0;
-                    margin: 0;
-                    font-family: -apple-system, BlinkMacSystemFont, Segoe UI,
-                        Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
-                        Helvetica Neue, sans-serif;
-                    pointer-events: none;
-                }
-
-                a {
-                    color: inherit;
-                    text-decoration: none;
-                }
-
-                * {
-                    margin: 0;
-                    box-sizing: border-box;
-                }
-            `}</style>
-
-            <style jsx>{`
-                .app-content {
-                    margin-left: ${contentMargin}px;
-                    pointer-events: all;
-                }
-            `}</style>
-
+            {/* Don't display the sidebar if on the Home page (login) */}
             {page !== Pages.Home ? (
                 <SideBar currentPage={page} ref={sbRef} resized={calcMargin} />
             ) : (
                 ''
             )}
 
-            <div className="app-content">
+            <div
+                className={styles.appContent}
+                style={
+                    // Add the previously mentioned margin to accommodate the
+                    // sidebar
+                    { marginLeft: `${contentMargin}px` }
+                }
+            >
                 <Component {...pageProps} />
             </div>
         </AuthContext.Provider>

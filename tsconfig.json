@@ -20,7 +20,8 @@
       "$pages/*": ["./pages/*"],
       "$components/*": ["./components/*"],
       "$public/*": ["./pubic/*"],
-      "$assets/*": ["./assets/*"]
+      "$assets/*": ["./assets/*"],
+      "$styles/*": ["./styles/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

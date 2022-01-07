@@ -1,33 +1,48 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl, { AnySourceData, Marker } from 'mapbox-gl';
-import {
-    Feature,
-    FeatureCollection,
-    GeoJsonProperties,
-    Geometry,
-} from 'geojson';
-
-mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_KEY ?? '';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import mapboxgl from 'mapbox-gl';
+import { Loading, Notify } from 'notiflix';
+import styles from '$styles/components/Map.module.scss';
+import AuthContext from '$components/contexts/AuthContext';
+import { Site } from '$lib/api/Site';
 
 const Map = () => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
+    const { fetchPrivileged } = useContext(AuthContext);
 
     const [lng, setLng] = useState(173);
     const [lat, setLat] = useState(-41);
     const [zoom, setZoom] = useState(5);
-    const [points, setPoints] = useState<null>(null);
+    const [stations, setStations] = useState<Site[] | null>(null);
     const [map, setMap] = useState<null | mapboxgl.Map>(null);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [currentPoint, setCurrentPoint] = useState<number | null>(null);
     const [firstLoad, setFirstLoad] = useState(true);
 
     useEffect(() => {
-        fetch('/api/get-points')
+        Loading.pulse('Loading map points', {
+            messageID: 'loadingPoints',
+        });
+        fetchPrivileged({
+            url: '/sites',
+            params: {},
+            method: 'GET',
+        })
             .then(async (res) => {
-                setPoints(await res.json());
+                if (res.status === 200) {
+                    setStations(await res.json());
+                    Notify.info('Loaded points');
+                    Loading.remove();
+                } else {
+                    Loading.remove();
+                    Notify.failure(
+                        'Could not load points, Error: ' + res.status
+                    );
+                }
             })
             .catch((ex) => {
-                console.error('Could not fetch points', points);
+                Loading.remove();
+                Notify.failure('Could not get points, Error: ', ex.status);
+                console.error('Could not fetch points', stations);
             });
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -69,6 +84,7 @@ const Map = () => {
 
             // Clean up on unmount
             return () => {
+                Loading.remove();
                 setMap(null);
                 map.remove();
             };
@@ -76,38 +92,27 @@ const Map = () => {
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
-        if (map && imageLoaded && points) {
-            // for (const point of points.features) {
-            //     const marker = new mapboxgl.Marker({
-            //         color: '#fff',
-            //         draggable: false,
-            //     }).setLngLat();
-            // }
+        if (map && imageLoaded && stations) {
+            for (const station of stations) {
+                const marker = new mapboxgl.Marker({
+                    color: '#fff',
+                    draggable: false,
+                })
+                    .setLngLat([station.lon, station.lat])
+                    .on('click', () => {
+                        console.log('Clicked on ', station);
+                    })
+                    .addTo(map);
+            }
 
             setFirstLoad(false);
         }
-    }, [map, points, imageLoaded]);
+    }, [map, stations, imageLoaded]);
 
     return (
-        <>
-            <style lang="scss" jsx>
-                {`
-                    .map-container {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        height: 100vh;
-                        width: 100%;
-                        z-index: -1;
-                        padding: 1rem;
-                    }
-                `}
-            </style>
-
-            <div>
-                <div className="map-container" ref={mapContainerRef} />
-            </div>
-        </>
+        <div>
+            <div className={styles.mapContainer} ref={mapContainerRef} />
+        </div>
     );
 };
 

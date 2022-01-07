@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
-const useSessionStorage = <T>(key: string, initial: T): T => {
+const useSessionStorage = <T>(
+    key: string,
+    initial: T
+): [T, Dispatch<SetStateAction<T>>] => {
     const [value, setValue] = useState(initial);
 
     useEffect(() => {
@@ -10,7 +13,11 @@ const useSessionStorage = <T>(key: string, initial: T): T => {
         }
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    return value;
+    useEffect(() => {
+        sessionStorage.setItem(key, JSON.stringify(value));
+    }, [value]);
+
+    return [value, setValue];
 };
 
 export default useSessionStorage;

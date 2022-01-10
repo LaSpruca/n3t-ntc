@@ -88,7 +88,7 @@ const SideBar = forwardRef(function SideBarComponent(
                 className={`${styles.sidebar__section} ${styles.sidebar__sectionSmall}`}
             >
                 <button className={styles.navButton}>
-                    <AccountCircleOutlined className={styles.navButton} />
+                    <AccountCircleOutlined className={styles.navButton__icon} />
                     <span className={styles.navButton__text}>Account</span>
                 </button>
             </div>

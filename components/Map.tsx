@@ -4,6 +4,8 @@ import { Loading, Notify } from 'notiflix';
 import styles from '$styles/components/Map.module.scss';
 import AuthContext from '$components/contexts/AuthContext';
 import { Site } from '$lib/api/Site';
+import Filter from '@mui/icons-material/FilterAlt';
+import useSessionStorage from '$lib/hooks/useSessionStorage';
 
 const Map = () => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -12,39 +14,47 @@ const Map = () => {
     const [lng, setLng] = useState(173);
     const [lat, setLat] = useState(-41);
     const [zoom, setZoom] = useState(5);
-    const [stations, setStations] = useState<Site[] | null>(null);
+    const [stations, setStations, stationsReady] = useSessionStorage<
+        Site[] | null
+    >('stations', null);
     const [map, setMap] = useState<null | mapboxgl.Map>(null);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [currentPoint, setCurrentPoint] = useState<number | null>(null);
     const [firstLoad, setFirstLoad] = useState(true);
 
+    const filtersRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
-        Loading.pulse('Loading map points', {
-            messageID: 'loadingPoints',
-        });
-        fetchPrivileged({
-            url: '/sites',
-            params: {},
-            method: 'GET',
-        })
-            .then(async (res) => {
-                if (res.status === 200) {
-                    setStations(await res.json());
-                    Notify.info('Loaded points');
-                    Loading.remove();
-                } else {
-                    Loading.remove();
-                    Notify.failure(
-                        'Could not load points, Error: ' + res.status
-                    );
-                }
-            })
-            .catch((ex) => {
-                Loading.remove();
-                Notify.failure('Could not get points, Error: ', ex.status);
-                console.error('Could not fetch points', stations);
+        console.log(stations, stations === null);
+        if (stations === null && stationsReady) {
+            Loading.pulse('Loading map points', {
+                messageID: 'loadingPoints',
             });
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+            fetchPrivileged({
+                url: '/sites',
+                params: {},
+                method: 'GET',
+            })
+                .then(async (res) => {
+                    if (res.status === 200) {
+                        setStations(await res.json());
+                        Notify.info('Loaded points');
+                        Loading.remove();
+                    } else {
+                        Loading.remove();
+                        Notify.failure(
+                            'Could not load points, Error: ' + res.status
+                        );
+                    }
+                })
+                .catch((ex) => {
+                    Loading.remove();
+                    Notify.failure('Could not get points, Error: ', ex.status);
+                    console.error('Could not fetch points', stations);
+                });
+        }
+    }, [stationsReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Initialize map when component mounts
     useEffect(() => {
@@ -109,9 +119,33 @@ const Map = () => {
         }
     }, [map, stations, imageLoaded]);
 
+    useEffect(() => {
+        if (filtersRef.current) {
+            filtersRef.current.onmouseout = (_) => {
+                if (filtersRef.current)
+                    filtersRef.current.className = styles.filters;
+            };
+        }
+    }, [filtersRef]);
+
+    const showFilters = () => {
+        if (filtersRef.current)
+            filtersRef.current.className =
+                styles.filters + ' ' + styles.filtersExapnded;
+    };
+
     return (
         <div>
             <div className={styles.mapContainer} ref={mapContainerRef} />
+            <div className={styles.filters} ref={filtersRef}>
+                <button
+                    onClick={showFilters}
+                    className={styles.filters__expandButton}
+                >
+                    <Filter className={styles.filters__icon} />
+                    <span className={styles.filters__text}>Filters</span>
+                </button>
+            </div>
         </div>
     );
 };

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, Dispatch, useContext, useState } from 'react';
 import useSessionStorage from '$lib/hooks/useSessionStorage';
 import TrafficApiError from '$lib/api/TrafficApiError';
 import AuthenticationResponseType from '$lib/api/auth/AuthenticationResponseType';
@@ -23,11 +23,9 @@ export interface AuthState extends StoredAuthState {
     fetchPrivileged: (req: PrivilegedRequest) => Promise<Response>;
 }
 
-export const useAuthContext = () => {
-    const [storedAuth, setStoredAuth] = useSessionStorage<StoredAuthState>(
-        'authState',
-        {}
-    );
+export const useAuthContext = (): [AuthState, boolean] => {
+    const [storedAuth, setStoredAuth, storedAuthRead] =
+        useSessionStorage<StoredAuthState>('authState', {});
 
     let apiUrl = '';
     const setApiUrl = (url: string) => (apiUrl = url);
@@ -146,14 +144,17 @@ export const useAuthContext = () => {
                 method,
             }
         );
-    return {
-        ...storedAuth,
-        login,
-        logout,
-        setApiUrl,
-        apiUrl,
-        fetchPrivileged,
-    };
+    return [
+        {
+            ...storedAuth,
+            login,
+            logout,
+            setApiUrl,
+            apiUrl,
+            fetchPrivileged,
+        },
+        storedAuthRead,
+    ];
 };
 
 const AuthContext = createContext<AuthState>({

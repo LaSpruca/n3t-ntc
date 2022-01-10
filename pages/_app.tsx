@@ -43,17 +43,26 @@ function App({ Component, pageProps }: AppProps) {
     useEffect(calcMargin, [page, sbRef]);
 
     // Generate the AuthContext objects
-    const authState = useAuthContext();
+    const [authState, authStateReady] = useAuthContext();
 
     // Redirect if not logged in and not on login page
-    if (
-        typeof window !== 'undefined' &&
-        page !== Pages.Home &&
-        !authState.accessToken
-    ) {
-        router.push('/');
-        return <></>;
-    }
+    useEffect(() => {
+        console.log(authState);
+
+        if (
+            typeof window !== 'undefined' &&
+            page !== Pages.Home &&
+            authState.accessToken === ''
+        ) {
+            router.push('/').catch((ex) => {
+                throw ex;
+            });
+        } else if (page === Pages.Home) {
+            router.push('/map').catch((ex) => {
+                throw ex;
+            });
+        }
+    }, [authStateReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <AuthContext.Provider value={authState}>

@@ -6,6 +6,7 @@ import AuthContext from '$components/contexts/AuthContext';
 import { Site } from '$lib/api/Site';
 import Filter from '@mui/icons-material/FilterAlt';
 import useSessionStorage from '$lib/hooks/useSessionStorage';
+import FiltersBar from "$components/FiltersBar";
 
 const Map = () => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -22,7 +23,7 @@ const Map = () => {
     const [currentPoint, setCurrentPoint] = useState<number | null>(null);
     const [firstLoad, setFirstLoad] = useState(true);
 
-    const filtersRef = useRef<HTMLDivElement>(null);
+    const filtersRef = useRef<(coords: [number, number]) => void>(null);
 
     useEffect(() => {
         console.log(stations, stations === null);
@@ -120,32 +121,18 @@ const Map = () => {
     }, [map, stations, imageLoaded]);
 
     useEffect(() => {
-        if (filtersRef.current) {
-            filtersRef.current.onmouseout = (_) => {
+        if (mapContainerRef.current) {
+            mapContainerRef.current.onclick = ({x, y}) => {
                 if (filtersRef.current)
-                    filtersRef.current.className = styles.filters;
+                    filtersRef.current([x, y]);
             };
         }
-    }, [filtersRef]);
-
-    const showFilters = () => {
-        if (filtersRef.current)
-            filtersRef.current.className =
-                styles.filters + ' ' + styles.filtersExapnded;
-    };
+    }, [mapContainerRef, filtersRef]);
 
     return (
         <div>
             <div className={styles.mapContainer} ref={mapContainerRef} />
-            <div className={styles.filters} ref={filtersRef}>
-                <button
-                    onClick={showFilters}
-                    className={styles.filters__expandButton}
-                >
-                    <Filter className={styles.filters__icon} />
-                    <span className={styles.filters__text}>Filters</span>
-                </button>
-            </div>
+            <FiltersBar updateFilters={() => {}} ref={filtersRef} />
         </div>
     );
 };

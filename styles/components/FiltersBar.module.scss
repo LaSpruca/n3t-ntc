@@ -1,0 +1,114 @@
+@import "../colors";
+
+.filters {
+  border-radius: 10px;
+  overflow: hidden;
+  position: fixed;
+  top: 2.5rem;
+  right: 2.5rem;
+  z-index: 999;
+  background-color: $ui-primary;
+  color: #fff;
+
+  &__text {
+    display: none;
+    width: 0;
+    font-weight: bold;
+    transition: width 5s ease-in-out;
+  }
+
+  &__expandButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: inherit;
+    border: none;
+    padding: 1rem;
+    gap: 1rem;
+    color: inherit;
+  }
+
+  &__content {
+    display: none;
+
+    &__filter {
+      &:not(:first-child) {
+        padding-top: 0.5rem;
+      }
+      display: flex;
+      gap: 0.5px;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+
+      label {
+        width: 30%;
+      }
+
+      &Date {
+        text-align: center;
+        border: 2px #fff solid;
+        color: #fff;
+        background: none;
+        width: 100%;
+        border-radius: 10px;
+        padding: 0.5rem;
+        transition: outline-width 0.05s linear;
+
+        &Wrapper {
+          width: 65%;
+        }
+      }
+    }
+  }
+
+  &Exapnded {
+    height: calc(100vh - 5rem);
+
+    .filters {
+      &__expandButton {
+        display: none;
+      }
+
+      &__content {
+        color: inherit;
+        display: block;
+        text-align: center;
+        padding: 1rem;
+        position: relative;
+
+        .filters__collapseButton {
+          $size: 1.9rem;
+
+          position: absolute;
+          top: 0.5rem;
+          right: 0.5rem;
+
+          width: $size;
+          height: $size;
+
+          border-radius: 100%;
+          background: none;
+          border: #fff solid 1px;
+
+          svg {
+            color: #fff;
+            width: calc(#{$size} - 0.9rem);
+            height: calc(#{$size} - 0.9rem);
+          }
+        }
+
+        h1 {
+          padding: 1rem;
+        }
+      }
+    }
+  }
+
+  &:hover {
+    .filters__text {
+      width: fit-content;
+      display: initial;
+    }
+  }
+}

@@ -1,12 +1,14 @@
-import type { AppProps } from 'next/app';
+import type {AppProps} from 'next/app';
 import Head from 'next/head';
 import SideBar from '../components/SideBar';
-import React, { createRef, useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import Pages, { floatingSideBarPages, pageMap, pageTitle } from '$lib/pages';
-import AuthContext, { useAuthContext } from '$components/contexts/AuthContext';
+import React, {createRef, useEffect, useState} from 'react';
+import {useRouter} from 'next/router';
+import Pages, {floatingSideBarPages, pageMap, pageTitle} from '$lib/pages';
+import AuthContext, {useAuthContext} from '$components/contexts/AuthContext';
 import '../styles/global.scss';
 import styles from '../styles/pages/_app.module.scss';
+import nz from 'date-fns/locale/en-NZ';
+import {registerLocale, setDefaultLocale} from "react-datepicker";
 
 /**
  * Map "layout" of the app, setup state and adds sidebar, makes sure that the
@@ -16,7 +18,12 @@ import styles from '../styles/pages/_app.module.scss';
  * @param env The environment variables loaded at runtime
  * @constructor
  */
-function App({ Component, pageProps }: AppProps) {
+function App({Component, pageProps}: AppProps) {
+    // Set the default locale to the NZ locale
+    registerLocale('nz', nz);
+    setDefaultLocale('nz');
+
+    // Get the router
     const router = useRouter();
 
     // Ref to the sidebar
@@ -45,22 +52,23 @@ function App({ Component, pageProps }: AppProps) {
     // Generate the AuthContext objects
     const [authState, authStateReady] = useAuthContext();
 
-    // Redirect if not logged in and not on login page
+    // Redirect if not logged in and not on login page, or if they are logged in, send 'em to the map page
     useEffect(() => {
         console.log(authState);
-
-        if (
-            typeof window !== 'undefined' &&
-            page !== Pages.Home &&
-            authState.accessToken === ''
-        ) {
-            router.push('/').catch((ex) => {
-                throw ex;
-            });
-        } else if (page === Pages.Home) {
-            router.push('/map').catch((ex) => {
-                throw ex;
-            });
+        if (typeof window !== "undefined") {
+            if (
+                (!("accessToken" in authState) || authState.accessToken === '')
+            ) {
+                if (page !== Pages.Home) {
+                    router.push('/').catch((ex) => {
+                        throw ex;
+                    });
+                }
+            } else if (page === Pages.Home) {
+                router.push('/map').catch((ex) => {
+                    throw ex;
+                });
+            }
         }
     }, [authStateReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -75,7 +83,7 @@ function App({ Component, pageProps }: AppProps) {
             </Head>
             {/* Don't display the sidebar if on the Home page (login) */}
             {page !== Pages.Home ? (
-                <SideBar currentPage={page} ref={sbRef} resized={calcMargin} />
+                <SideBar currentPage={page} ref={sbRef} resized={calcMargin}/>
             ) : (
                 ''
             )}
@@ -85,7 +93,7 @@ function App({ Component, pageProps }: AppProps) {
                 style={
                     // Add the previously mentioned margin to accommodate the
                     // sidebar
-                    { marginLeft: `${contentMargin}px` }
+                    {marginLeft: `${contentMargin}px`}
                 }
             >
                 <Component {...pageProps} />
